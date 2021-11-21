@@ -6,6 +6,7 @@ build:
   stage: build
   tags:
     - docker
+    - virtual
   script: make
   artifacts:
     paths:
@@ -16,6 +17,7 @@ test:
   stage: test
   tags:
     - docker
+    - virtual
   script:
     - /grader/run_grader.sh $(pwd) lab-3-robust
 
