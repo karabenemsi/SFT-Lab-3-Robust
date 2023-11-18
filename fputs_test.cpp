@@ -12,7 +12,9 @@
 #include "tests.h"
 #include "stats.h"
 
-FILE *generateFILE(int test_id) {
+#define originalFileName "test.txt"
+#define testFileName "test_copy.txt"
+
     // generate test FILE* test value
     // see tests.h
     // use the functions specified by tools.h to create appropriate test values
