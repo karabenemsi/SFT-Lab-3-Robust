@@ -1,6 +1,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #include <cstdio>
 #include <cstring>
@@ -15,10 +16,78 @@
 #define originalFileName "test.txt"
 #define testFileName "test_copy.txt"
 
+
+
+FILE* generateFILE(int test_id) {
     // generate test FILE* test value
     // see tests.h
     // use the functions specified by tools.h to create appropriate test values
     // you can use a copy of test.txt as a file to test on
+    FILE* file;
+    char* file_content;
+    struct stat st;
+    stat(testFileName, &st);
+    int fileSize = st.st_size;
+
+
+    filecopy(originalFileName, testFileName);
+    switch (test_id) {
+    case 0:
+        return NULL;
+        break;
+    case 1:
+        return fopen(testFileName, "r");
+        break;
+    case 2:
+        return fopen(testFileName, "w");
+        break;
+    case 3:
+        return fopen(testFileName, "rw");
+        break;
+    case 4:
+        file = fopen(testFileName, "w");
+        fclose(file);
+        return file;
+        break;
+    case 5:
+        file = fopen(testFileName, "r");
+        file_content = new char[fileSize];
+        fread(file_content, fileSize, 1, file);
+        fclose(file);
+        return (FILE*)malloc_prot(fileSize, file_content, PROT_READ);
+        break;
+    case 6:
+        file = fopen(testFileName, "r");
+        file_content = new char[fileSize];
+        fread(file_content, fileSize, 1, file);
+        fclose(file);
+        return (FILE*)malloc_prot(fileSize, file_content, PROT_WRITE);
+        break;
+    case 7:
+        file = fopen(testFileName, "r");
+        file_content = new char[fileSize];
+        fread(file_content, fileSize, 1, file);
+        fclose(file);
+        return (FILE*)malloc_prot(fileSize, file_content, PROT_READ | PROT_WRITE);
+        break;
+    case 8:
+        return (FILE*)malloc_prot(fileSize, NULLpage(), PROT_READ);
+        break;
+    case 9:
+        return (FILE*)malloc_prot(fileSize, NULLpage(), PROT_WRITE);
+        break;
+    case 10:
+        return (FILE*)malloc_prot(fileSize, NULLpage(), PROT_READ | PROT_WRITE);
+        break;
+    case 11:
+        return (FILE*)malloc_prot(fileSize, NULLpage(), PROT_NONE);
+        break;
+    default:
+        break;
+    }
+    return NULL;
+}
+
 const char* generateCSTR(int test_id) {
     // generate a `const char*` test value
     // see tests.h
