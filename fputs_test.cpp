@@ -42,7 +42,7 @@ FILE* generateFILE(int test_id) {
         return fopen(testFileName, "w");
         break;
     case 3:
-        return fopen(testFileName, "rw");
+        return fopen(testFileName, "r+");
         break;
     case 4:
         file = fopen(testFileName, "w");
@@ -71,16 +71,16 @@ FILE* generateFILE(int test_id) {
         return (FILE*)malloc_prot(fileSize, file_content, PROT_READ | PROT_WRITE);
         break;
     case 8:
-        return (FILE*)malloc_prot(fileSize, NULLpage(), PROT_READ);
+        return (FILE*)malloc_prot(getpagesize(), NULLpage(), PROT_READ);
         break;
     case 9:
-        return (FILE*)malloc_prot(fileSize, NULLpage(), PROT_WRITE);
+        return (FILE*)malloc_prot(getpagesize(), NULLpage(), PROT_WRITE);
         break;
     case 10:
-        return (FILE*)malloc_prot(fileSize, NULLpage(), PROT_READ | PROT_WRITE);
+        return (FILE*)malloc_prot(getpagesize(), NULLpage(), PROT_READ | PROT_WRITE);
         break;
     case 11:
-        return (FILE*)malloc_prot(fileSize, NULLpage(), PROT_NONE);
+        return (FILE*)malloc_prot(getpagesize(), NULLpage(), PROT_NONE);
         break;
     default:
         break;
@@ -93,32 +93,34 @@ const char* generateCSTR(int test_id) {
     // see tests.h
     // use the functions specified by tools.h to create appropriate test values
     const char* valid_str = "Hello World!";
-    const char invalid_str[] = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd', '!'};
+    const int valid_str_len = 13;
+    const char invalid_str[] = { 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd', '!' };
+    const int invalid_str_len = 12;
 
     switch (test_id) {
     case 0:
         return NULL;
         break;
     case 1:
-        return (const char*)malloc_prot(sizeof(valid_str), valid_str, PROT_READ);
+        return (const char*)malloc_prot(valid_str_len, valid_str, PROT_READ);
         break;
     case 2:
-        return (const char*)malloc_prot(sizeof(valid_str), valid_str, PROT_WRITE);
+        return (const char*)malloc_prot(valid_str_len, valid_str, PROT_WRITE);
         break;
     case 3:
-        return (const char*)malloc_prot(sizeof(valid_str), valid_str, PROT_READ | PROT_WRITE);
+        return (const char*)malloc_prot(valid_str_len, valid_str, PROT_READ | PROT_WRITE);
         break;
     case 4:
-        return (const char*)malloc_prot(sizeof(invalid_str), invalid_str, PROT_READ);
+        return (const char*)malloc_prot(invalid_str_len, invalid_str, PROT_READ);
         break;
     case 5:
-        return (const char*)malloc_prot(sizeof(invalid_str), invalid_str, PROT_READ);
+        return (const char*)malloc_prot(invalid_str_len, invalid_str, PROT_READ);
         break;
     case 6:
-        return (const char*)malloc_prot(sizeof(invalid_str), invalid_str, PROT_WRITE);
+        return (const char*)malloc_prot(invalid_str_len, invalid_str, PROT_WRITE);
         break;
     case 7:
-        return (const char*)malloc_prot(sizeof(valid_str), valid_str, PROT_NONE);
+        return (const char*)malloc_prot(valid_str_len, valid_str, PROT_NONE);
         break;
 
     default:
@@ -154,12 +156,14 @@ void test_fputs(const TestCase& str_testCase, const TestCase& file_testCase) {
             record_timedout_test_fputs();
         } else {
             if (WIFEXITED(status)) {
-                const int returnval = WEXITSTATUS(status);
+                int returnval = WEXITSTATUS(status);
+                if(returnval == 255) returnval = -1; // EOF is -1 but gets converted to 255
                 record_ok_test_fputs(returnval);
                 // if (returnval == str_testCase.expected_returnvalue) {
-                //      record_ok_test_fputs(returnval);
+                //     //  record_ok_test_fputs(returnval);
                 // } else {
-                //     record_error_test_fputs(returnval);
+                //     std::cout << "returnval: " << returnval << ", expected " << str_testCase.expected_returnvalue << std::endl;
+                //     //     record_error_test_fputs(returnval);
                 // }
             } else if (WIFSIGNALED(status)) {
                 const int signal = WTERMSIG(status);
@@ -170,6 +174,9 @@ void test_fputs(const TestCase& str_testCase, const TestCase& file_testCase) {
             }
         }
     }
+
+    // clean up
+    remove(testFileName);
 }
 
 int main(int argc, const char** argv) {
