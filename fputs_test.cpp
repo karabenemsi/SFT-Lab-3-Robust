@@ -19,12 +19,43 @@
     // see tests.h
     // use the functions specified by tools.h to create appropriate test values
     // you can use a copy of test.txt as a file to test on
-}
-
-const char *generateCSTR(int test_id) {
+const char* generateCSTR(int test_id) {
     // generate a `const char*` test value
     // see tests.h
     // use the functions specified by tools.h to create appropriate test values
+    const char* valid_str = "Hello World!";
+    const char invalid_str[] = {'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd', '!'};
+
+    switch (test_id) {
+    case 0:
+        return NULL;
+        break;
+    case 1:
+        return (const char*)malloc_prot(sizeof(valid_str), valid_str, PROT_READ);
+        break;
+    case 2:
+        return (const char*)malloc_prot(sizeof(valid_str), valid_str, PROT_WRITE);
+        break;
+    case 3:
+        return (const char*)malloc_prot(sizeof(valid_str), valid_str, PROT_READ | PROT_WRITE);
+        break;
+    case 4:
+        return (const char*)malloc_prot(sizeof(invalid_str), invalid_str, PROT_READ);
+        break;
+    case 5:
+        return (const char*)malloc_prot(sizeof(invalid_str), invalid_str, PROT_READ);
+        break;
+    case 6:
+        return (const char*)malloc_prot(sizeof(invalid_str), invalid_str, PROT_WRITE);
+        break;
+    case 7:
+        return (const char*)malloc_prot(sizeof(valid_str), valid_str, PROT_NONE);
+        break;
+
+    default:
+        break;
+    }
+    return NULL;
 }
 
 // waiting time before querying the child's exit status
