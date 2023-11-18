@@ -35,10 +35,20 @@ const double wait_time = 1.0;
 void test_fputs(const TestCase &str_testCase, const TestCase &file_testCase) {
     // execute a single test
     // use the functions in stats.h to record all tests
-}
-
-int main(int argc, const char **argv) {
+int main(int argc, const char** argv) {
     // execute all tests and catch exceptions
+    for (int i = 0; i < testCases_CSTR_count; i++) {
+        for (int j = 0; j < testCases_FILE_count; j++) {
+            try {
+                test_fputs(testCases_CSTR[i], testCases_FILE[j]);
+            } catch (const char* msg) {
+                std::cerr << "Exception: " << msg << std::endl;
+            }
+        }
+    }
+
+    // print summary
+    print_summary();
 
     return 0;
 }
