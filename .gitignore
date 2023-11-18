@@ -1,0 +1,3 @@
+*.o
+fputs_test
+test_copy.txt
