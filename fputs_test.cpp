@@ -29,9 +29,9 @@ FILE* generateFILE(int test_id) {
     stat(originalFileName, &st);
     int fileSize = st.st_size;
     FILE* returnFile;
-
-
     filecopy(originalFileName, testFileName);
+
+
     switch (test_id) {
     case 0:
         return NULL;
@@ -64,7 +64,7 @@ FILE* generateFILE(int test_id) {
         file_content = new char[fileSize];
         fread(file_content, fileSize, 1, file);
         fclose(file);
-        returnFile = (FILE*)malloc_prot(fileSize, file_content, PROT_READ);
+        returnFile = (FILE*)malloc_prot(fileSize, file_content, PROT_WRITE);
         delete[] file_content;
         return returnFile;
         break;
@@ -73,21 +73,21 @@ FILE* generateFILE(int test_id) {
         file_content = new char[fileSize];
         fread(file_content, fileSize, 1, file);
         fclose(file);
-        returnFile = (FILE*)malloc_prot(fileSize, file_content, PROT_READ);
+        returnFile = (FILE*)malloc_prot(fileSize, file_content, PROT_READ | PROT_WRITE);
         delete[] file_content;
         return returnFile;
         break;
     case 8:
-        return (FILE*)malloc_prot(getpagesize(), NULLpage(), PROT_READ);
+        return (FILE*)malloc_prot(fileSize, NULLpage(), PROT_READ);
         break;
     case 9:
-        return (FILE*)malloc_prot(getpagesize(), NULLpage(), PROT_WRITE);
+        return (FILE*)malloc_prot(fileSize, NULLpage(), PROT_WRITE);
         break;
     case 10:
-        return (FILE*)malloc_prot(getpagesize(), NULLpage(), PROT_READ | PROT_WRITE);
+        return (FILE*)malloc_prot(fileSize, NULLpage(), PROT_READ | PROT_WRITE);
         break;
     case 11:
-        return (FILE*)malloc_prot(getpagesize(), NULLpage(), PROT_NONE);
+        return (FILE*)malloc_prot(fileSize, NULLpage(), PROT_NONE);
         break;
     default:
         break;
@@ -100,7 +100,7 @@ const char* generateCSTR(int test_id) {
     // see tests.h
     // use the functions specified by tools.h to create appropriate test values
     const int str_len = 5;
-    const char* valid_str = "test";
+    const char valid_str[5] = { 't','e','s','t','\0' };
     const char invalid_str[5] = { 't','e','s','t','2' };
     // const char* heap_str = (char*)malloc(str_len);
 
@@ -126,11 +126,11 @@ const char* generateCSTR(int test_id) {
         break;
     case 5:
         // strcpy((char*)invalid_str, heap_str);
-        return (const char*)malloc_prot(str_len, invalid_str, PROT_READ);
+        return (const char*)malloc_prot(str_len, invalid_str, PROT_WRITE);
         break;
     case 6:
         // strcpy((char*)invalid_str, heap_str);
-        return (const char*)malloc_prot(str_len, invalid_str, PROT_WRITE);
+        return (const char*)malloc_prot(str_len, invalid_str, PROT_READ | PROT_WRITE);
         break;
     case 7:
         return (const char*)malloc_prot(str_len, NULL, PROT_NONE);
@@ -148,6 +148,49 @@ const char* generateCSTR(int test_id) {
 const double wait_time = 0.2;
 
 void test_fputs(const TestCase& str_testCase, const TestCase& file_testCase) {
+    // int fully_successfull_str[5] = { 0,1,3,4,7 };
+
+    // int successfull_cases[24][2] = {
+    //     {2,0},
+    //     {2,1},
+    //     {2,2},
+    //     {2,3},
+    //     {2,4},
+    //     {2,5},
+    //     {2,6},
+    //     {2,7},
+    //     {2,8},
+    //     {2,11},
+    //     {5,0},
+    //     {5,5},
+    //     {5,6},
+    //     {5,7},
+    //     {5,8},
+    //     {5,9},
+    //     {5,10},
+    //     {5,11},
+    //     {6,0},
+    //     {6,5},
+    //     {6,6},
+    //     {6,7},
+    //     {6,8},
+    //     {6,11}
+    // };
+
+    // for (int i = 0; i < 5; i++) {
+    //     if (str_testCase.id == fully_successfull_str[i]) {
+    //         return;
+    //     }
+    // }
+
+    // for (int i = 0; i < 24; i++) {
+    //     if (str_testCase.id == successfull_cases[i][0] && file_testCase.id == successfull_cases[i][1]) {
+    //         return;
+    //     }
+    // }
+
+
+
     record_start_test_fputs(str_testCase, file_testCase);
     pid_t pid = fork();
     // execute fputs in child process
