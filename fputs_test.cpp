@@ -102,38 +102,38 @@ const char* generateCSTR(int test_id) {
     const int str_len = 5;
     const char valid_str[5] = { 't','e','s','t','\0' };
     const char invalid_str[5] = { 't','e','s','t','2' };
-    const char* heap_str = (char*)malloc(str_len);
+    // const char* heap_str = (char*)malloc(str_len);
 
     switch (test_id) {
     case 0:
         return NULL;
         break;
     case 1:
-        strcpy((char*)valid_str, heap_str);
-        return (const char*)malloc_prot(str_len, heap_str, PROT_READ);
+        // strcpy((char*)valid_str, heap_str);
+        return (const char*)malloc_prot(str_len, valid_str, PROT_READ);
         break;
     case 2:
-        strcpy((char*)valid_str, heap_str);
-        return (const char*)malloc_prot(str_len, heap_str, PROT_WRITE);
+        // strcpy((char*)valid_str, heap_str);
+        return (const char*)malloc_prot(str_len, valid_str, PROT_WRITE);
         break;
     case 3:
-        strcpy((char*)valid_str, heap_str);
-        return (const char*)malloc_prot(str_len, heap_str, PROT_READ | PROT_WRITE);
+        // strcpy((char*)valid_str, heap_str);
+        return (const char*)malloc_prot(str_len, valid_str, PROT_READ | PROT_WRITE);
         break;
     case 4:
-        strcpy((char*)invalid_str, heap_str);
-        return (const char*)malloc_prot(str_len, heap_str, PROT_READ);
+        // strcpy((char*)invalid_str, heap_str);
+        return (const char*)malloc_prot(str_len, invalid_str, PROT_READ);
         break;
     case 5:
-        strcpy((char*)invalid_str, heap_str);
-        return (const char*)malloc_prot(str_len, heap_str, PROT_READ);
+        // strcpy((char*)invalid_str, heap_str);
+        return (const char*)malloc_prot(str_len, invalid_str, PROT_READ);
         break;
     case 6:
-        strcpy((char*)invalid_str, heap_str);
-        return (const char*)malloc_prot(str_len, heap_str, PROT_WRITE);
+        // strcpy((char*)invalid_str, heap_str);
+        return (const char*)malloc_prot(str_len, invalid_str, PROT_WRITE);
         break;
     case 7:
-        return (const char*)malloc_prot(str_len, valid_str, PROT_NONE);
+        return (const char*)malloc_prot(str_len, NULL, PROT_NONE);
         break;
 
     default:
