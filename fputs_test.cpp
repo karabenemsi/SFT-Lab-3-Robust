@@ -26,8 +26,9 @@ FILE* generateFILE(int test_id) {
     FILE* file;
     char* file_content;
     struct stat st;
-    stat(testFileName, &st);
+    stat(originalFileName, &st);
     int fileSize = st.st_size;
+    FILE* returnFile;
 
 
     filecopy(originalFileName, testFileName);
@@ -54,21 +55,27 @@ FILE* generateFILE(int test_id) {
         file_content = new char[fileSize];
         fread(file_content, fileSize, 1, file);
         fclose(file);
-        return (FILE*)malloc_prot(fileSize, file_content, PROT_READ);
+        returnFile = (FILE*)malloc_prot(fileSize, file_content, PROT_READ);
+        delete[] file_content;
+        return returnFile;
         break;
     case 6:
         file = fopen(testFileName, "r");
         file_content = new char[fileSize];
         fread(file_content, fileSize, 1, file);
         fclose(file);
-        return (FILE*)malloc_prot(fileSize, file_content, PROT_WRITE);
+        returnFile = (FILE*)malloc_prot(fileSize, file_content, PROT_READ);
+        delete[] file_content;
+        return returnFile;
         break;
     case 7:
         file = fopen(testFileName, "r");
         file_content = new char[fileSize];
         fread(file_content, fileSize, 1, file);
         fclose(file);
-        return (FILE*)malloc_prot(fileSize, file_content, PROT_READ | PROT_WRITE);
+        returnFile = (FILE*)malloc_prot(fileSize, file_content, PROT_READ);
+        delete[] file_content;
+        return returnFile;
         break;
     case 8:
         return (FILE*)malloc_prot(getpagesize(), NULLpage(), PROT_READ);
@@ -135,19 +142,17 @@ const char* generateCSTR(int test_id) {
 const double wait_time = 0.2;
 
 void test_fputs(const TestCase& str_testCase, const TestCase& file_testCase) {
-    // execute a single test
-    // use the functions in stats.h to record all tests
     record_start_test_fputs(str_testCase, file_testCase);
-    // generate test values
-    const char* str = generateCSTR(str_testCase.id);
-    FILE* file = generateFILE(file_testCase.id);
-    // create child process
     pid_t pid = fork();
     // execute fputs in child process
     if (pid == 0) {
+        // child process
+        const char* str = generateCSTR(str_testCase.id);
+        FILE* file = generateFILE(file_testCase.id);
         const int result = fputs(str, file);
         exit(result);
     } else {
+        // parent process
         sleep(wait_time);
         int status;
         pid_t w = waitpid(pid, &status, WNOHANG);
@@ -157,14 +162,14 @@ void test_fputs(const TestCase& str_testCase, const TestCase& file_testCase) {
         } else {
             if (WIFEXITED(status)) {
                 int returnval = WEXITSTATUS(status);
-                if(returnval == 255) returnval = -1; // EOF is -1 but gets converted to 255
+                if (returnval == 255) returnval = -1; // EOF is -1 but gets converted to 255
                 record_ok_test_fputs(returnval);
-                // if (returnval == str_testCase.expected_returnvalue) {
-                //     //  record_ok_test_fputs(returnval);
-                // } else {
-                //     std::cout << "returnval: " << returnval << ", expected " << str_testCase.expected_returnvalue << std::endl;
-                //     //     record_error_test_fputs(returnval);
-                // }
+                if (returnval == str_testCase.expected_returnvalue) {
+                    //  record_ok_test_fputs(returnval);
+                } else {
+                    std::cout << str_testCase.desc << "," << file_testCase.desc << " returnval: " << returnval << ", expected " << str_testCase.expected_returnvalue << std::endl;
+                    //     record_error_test_fputs(returnval);
+                }
             } else if (WIFSIGNALED(status)) {
                 const int signal = WTERMSIG(status);
                 record_crashed_test_fputs(signal);
@@ -175,8 +180,7 @@ void test_fputs(const TestCase& str_testCase, const TestCase& file_testCase) {
         }
     }
 
-    // clean up
-    remove(testFileName);
+
 }
 
 int main(int argc, const char** argv) {
@@ -190,6 +194,10 @@ int main(int argc, const char** argv) {
             }
         }
     }
+
+
+    // clean up
+    remove(testFileName);
 
     // print summary
     print_summary();
