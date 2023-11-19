@@ -100,7 +100,7 @@ const char* generateCSTR(int test_id) {
     // see tests.h
     // use the functions specified by tools.h to create appropriate test values
     const int str_len = 5;
-    const char valid_str[5] = { 't','e','s','t','\0' };
+    const char* valid_str = "test";
     const char invalid_str[5] = { 't','e','s','t','2' };
     // const char* heap_str = (char*)malloc(str_len);
 
