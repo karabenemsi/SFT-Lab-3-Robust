@@ -102,34 +102,27 @@ const char* generateCSTR(int test_id) {
     const int str_len = 5;
     const char valid_str[5] = { 't','e','s','t','\0' };
     const char invalid_str[5] = { 't','e','s','t','2' };
-    // const char* heap_str = (char*)malloc(str_len);
 
     switch (test_id) {
     case 0:
         return NULL;
         break;
     case 1:
-        // strcpy((char*)valid_str, heap_str);
         return (const char*)malloc_prot(str_len, valid_str, PROT_READ);
         break;
     case 2:
-        // strcpy((char*)valid_str, heap_str);
         return (const char*)malloc_prot(str_len, valid_str, PROT_WRITE);
         break;
     case 3:
-        // strcpy((char*)valid_str, heap_str);
         return (const char*)malloc_prot(str_len, valid_str, PROT_READ | PROT_WRITE);
         break;
     case 4:
-        // strcpy((char*)invalid_str, heap_str);
         return (const char*)malloc_prot(str_len, invalid_str, PROT_READ);
         break;
     case 5:
-        // strcpy((char*)invalid_str, heap_str);
         return (const char*)malloc_prot(str_len, invalid_str, PROT_WRITE);
         break;
     case 6:
-        // strcpy((char*)invalid_str, heap_str);
         return (const char*)malloc_prot(str_len, invalid_str, PROT_READ | PROT_WRITE);
         break;
     case 7:
@@ -148,50 +141,7 @@ const char* generateCSTR(int test_id) {
 const double wait_time = 0.2;
 
 void test_fputs(const TestCase& str_testCase, const TestCase& file_testCase) {
-    // int fully_successfull_str[5] = { 0,1,3,4,7 };
-
-    // int successfull_cases[24][2] = {
-    //     {2,0},
-    //     {2,1},
-    //     {2,2},
-    //     {2,3},
-    //     {2,4},
-    //     {2,5},
-    //     {2,6},
-    //     {2,7},
-    //     {2,8},
-    //     {2,11},
-    //     {5,0},
-    //     {5,5},
-    //     {5,6},
-    //     {5,7},
-    //     {5,8},
-    //     {5,9},
-    //     {5,10},
-    //     {5,11},
-    //     {6,0},
-    //     {6,5},
-    //     {6,6},
-    //     {6,7},
-    //     {6,8},
-    //     {6,11}
-    // };
-
-    // for (int i = 0; i < 5; i++) {
-    //     if (str_testCase.id == fully_successfull_str[i]) {
-    //         return;
-    //     }
-    // }
-
-    // for (int i = 0; i < 24; i++) {
-    //     if (str_testCase.id == successfull_cases[i][0] && file_testCase.id == successfull_cases[i][1]) {
-    //         return;
-    //     }
-    // }
-
-
-
-    record_start_test_fputs(str_testCase, file_testCase);
+       record_start_test_fputs(str_testCase, file_testCase);
     pid_t pid = fork();
     // execute fputs in child process
     if (pid == 0) {
@@ -213,9 +163,6 @@ void test_fputs(const TestCase& str_testCase, const TestCase& file_testCase) {
                 int returnval = WEXITSTATUS(status);
                 if (returnval == 255) returnval = -1; // EOF is -1 but gets converted to 255
                 record_ok_test_fputs(returnval);
-                // if (returnval != str_testCase.expected_returnvalue && returnval != file_testCase.expected_returnvalue) {
-                //     std::cout << str_testCase.desc << "," << file_testCase.desc << " returnval: " << returnval << ", expected " << str_testCase.expected_returnvalue << " or " << file_testCase.expected_returnvalue << std::endl;
-                // }
             } else if (WIFSIGNALED(status)) {
                 const int signal = WTERMSIG(status);
                 record_crashed_test_fputs(signal);
