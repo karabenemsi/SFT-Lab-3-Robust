@@ -133,7 +133,7 @@ const char* generateCSTR(int test_id) {
         return (const char*)malloc_prot(str_len, invalid_str, PROT_READ | PROT_WRITE);
         break;
     case 7:
-        return (const char*)malloc_prot(str_len, NULL, PROT_NONE);
+        return (const char*)malloc_prot(str_len, valid_str, PROT_NONE);
         break;
 
     default:
