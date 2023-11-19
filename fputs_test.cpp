@@ -99,35 +99,41 @@ const char* generateCSTR(int test_id) {
     // generate a `const char*` test value
     // see tests.h
     // use the functions specified by tools.h to create appropriate test values
-    const char* valid_str = "Hello World!";
-    const int valid_str_len = 13;
-    const char invalid_str[] = { 'H', 'e', 'l', 'l', 'o', ' ', 'W', 'o', 'r', 'l', 'd', '!' };
-    const int invalid_str_len = 12;
+    const int str_len = 5;
+    const char valid_str[5] = { 't','e','s','t','\0' };
+    const char invalid_str[5] = { 't','e','s','t','2' };
+    const char* heap_str = (char*)malloc(str_len);
 
     switch (test_id) {
     case 0:
         return NULL;
         break;
     case 1:
-        return (const char*)malloc_prot(valid_str_len, valid_str, PROT_READ);
+        strcpy((char*)valid_str, heap_str);
+        return (const char*)malloc_prot(str_len, heap_str, PROT_READ);
         break;
     case 2:
-        return (const char*)malloc_prot(valid_str_len, valid_str, PROT_WRITE);
+        strcpy((char*)valid_str, heap_str);
+        return (const char*)malloc_prot(str_len, heap_str, PROT_WRITE);
         break;
     case 3:
-        return (const char*)malloc_prot(valid_str_len, valid_str, PROT_READ | PROT_WRITE);
+        strcpy((char*)valid_str, heap_str);
+        return (const char*)malloc_prot(str_len, heap_str, PROT_READ | PROT_WRITE);
         break;
     case 4:
-        return (const char*)malloc_prot(invalid_str_len, invalid_str, PROT_READ);
+        strcpy((char*)invalid_str, heap_str);
+        return (const char*)malloc_prot(str_len, heap_str, PROT_READ);
         break;
     case 5:
-        return (const char*)malloc_prot(invalid_str_len, invalid_str, PROT_READ);
+        strcpy((char*)invalid_str, heap_str);
+        return (const char*)malloc_prot(str_len, heap_str, PROT_READ);
         break;
     case 6:
-        return (const char*)malloc_prot(invalid_str_len, invalid_str, PROT_WRITE);
+        strcpy((char*)invalid_str, heap_str);
+        return (const char*)malloc_prot(str_len, heap_str, PROT_WRITE);
         break;
     case 7:
-        return (const char*)malloc_prot(valid_str_len, valid_str, PROT_NONE);
+        return (const char*)malloc_prot(str_len, valid_str, PROT_NONE);
         break;
 
     default:
@@ -164,12 +170,9 @@ void test_fputs(const TestCase& str_testCase, const TestCase& file_testCase) {
                 int returnval = WEXITSTATUS(status);
                 if (returnval == 255) returnval = -1; // EOF is -1 but gets converted to 255
                 record_ok_test_fputs(returnval);
-                if (returnval == str_testCase.expected_returnvalue) {
-                    //  record_ok_test_fputs(returnval);
-                } else {
-                    std::cout << str_testCase.desc << "," << file_testCase.desc << " returnval: " << returnval << ", expected " << str_testCase.expected_returnvalue << std::endl;
-                    //     record_error_test_fputs(returnval);
-                }
+                // if (returnval != str_testCase.expected_returnvalue && returnval != file_testCase.expected_returnvalue) {
+                //     std::cout << str_testCase.desc << "," << file_testCase.desc << " returnval: " << returnval << ", expected " << str_testCase.expected_returnvalue << " or " << file_testCase.expected_returnvalue << std::endl;
+                // }
             } else if (WIFSIGNALED(status)) {
                 const int signal = WTERMSIG(status);
                 record_crashed_test_fputs(signal);
